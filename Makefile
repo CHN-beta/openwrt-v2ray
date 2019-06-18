@@ -47,7 +47,8 @@ PKG_CONFIG_DEPENDS := \
 	CONFIG_V2RAY_DISABLE_WEBSOCKET_TRANS \
 	CONFIG_V2RAY_DISABLE_HTTP2_TRANS \
 	CONFIG_V2RAY_DISABLE_DOMAIN_SOCKET_TRANS \
-	CONFIG_V2RAY_DISABLE_QUIC_TRANS
+	CONFIG_V2RAY_DISABLE_QUIC_TRANS \
+	CONFIG_V2RAY_DISABLE_OTHER_CHN_NEEDNOT
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
@@ -211,6 +212,23 @@ V2RAY_SED_ARGS += \
 	s/_ "v2ray.com\/core\/transport\/internet\/quic"/\/\/ &/;
 endif
 
+ifeq ($(CONFIG_V2RAY_DISABLE_OTHER_CHN_NEEDNOT),y)
+V2RAY_SED_ARGS += \
+	s/_ "v2ray.com\/core\/app\/commander"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/app\/log\/commander"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/app\/proxyman\/commander"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/app\/stats\/commander"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/proxy\/vmess\/inbound"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/udp"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/headers\/http"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/headers\/noop"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/headers\/srtp"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/headers\/tls"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/headers\/utp"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/headers\/wechat"/\/\/ &/; \
+	s/_ "v2ray.com\/core\/transport\/internet\/headers\/wireguard"/\/\/ &/;
+endif
+
 endif
 
 define Build/Prepare
@@ -241,6 +259,7 @@ define Build/Compile
 	$(eval GO_PKG_BUILD_PKG:=v2ray.com/core/main)
 	$(call GoPackage/Build/Compile,-ldflags "-s -w")
 	mv -f $(GO_PKG_BUILD_BIN_DIR)/main $(GO_PKG_BUILD_BIN_DIR)/v2ray
+	upx $(GO_PKG_BUILD_BIN_DIR)/v2ray
 
 ifneq ($(CONFIG_V2RAY_EXCLUDE_V2CTL),y)
 	$(eval GO_PKG_BUILD_PKG:=v2ray.com/core/infra/control/main)

@@ -142,4 +142,9 @@ config V2RAY_DISABLE_QUIC_TRANS
 	depends on V2RAY_DISABLE_CUSTOM
 	default n
 
+config V2RAY_DISABLE_OTHER_CHN_NEEDNOT
+	bool "Disable Other Compnents that needn't by CHN."
+	depends on V2RAY_DISABLE_CUSTOM
+	default n
+
 endmenu
